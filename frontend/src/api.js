@@ -1,5 +1,6 @@
-// Change only this value if the FastAPI server moves.
-const API_BASE_URL = "http://127.0.0.1:8000";
+// Vercel supplies VITE_API_BASE_URL during deployment.
+// The local value keeps development working without extra setup.
+const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || "http://127.0.0.1:8000";
 
 async function request(path, options = {}) {
   const token = localStorage.getItem("interntrack_token");
