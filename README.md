@@ -11,11 +11,10 @@ The backend runs on Render's free plan, so the first request after a period of i
 
 **Demo accounts** (sample data, created for this demo):
 
-| Email | Password |
-|-------|----------|
-| <demo1 email> | <password> |
-| <demo2 email> | <password> |
-| <demo3 email> | <password> |
+| Name | Email | Password |
+|------|-------|----------|
+| Tom | tom@email.com | Tom@1234 |
+| Alice | alice@email.com | Alice@1234 |
 
 You can also sign up with your own account.
 
