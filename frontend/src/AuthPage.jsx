@@ -22,6 +22,7 @@ export default function AuthPage({ onAuthenticated }) {
   return <main className="auth-page"><section className="auth-card">
     <p className="eyebrow">InternTrack</p><h1>{isRegistering ? "Create your account" : "Welcome back"}</h1>
     <p className="subtext">{isRegistering ? "Start organizing your internship applications." : "Log in to view your application tracker."}</p>
+    <p className="demo-note">Demo note: the free API can take up to one minute to wake up on the first request.</p>
     {error && <p className="alert error">{error}</p>}
     <form onSubmit={submit}>
       {isRegistering && <><label>Name</label><input name="name" value={form.name} onChange={change} required /></>}
