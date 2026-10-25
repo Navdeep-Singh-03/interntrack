@@ -1,113 +1,101 @@
 # InternTrack
 
-InternTrack is a simple full-stack internship application tracker. Each user can create an account, log in, and manage only their own applications.
+InternTrack is a full-stack internship application tracker. Users can create an account, manage their own internship applications, and use a simple AI Job-Fit Assistant to compare saved resume notes with a job description.
 
 ## Live demo
 
 - App: https://interntrack-umber.vercel.app
 - API docs: https://interntrack-gbx7.onrender.com/docs
 
-The backend runs on Render's free plan, so the first request after a period of inactivity can take about 50 seconds while the server wakes up.
+> The backend uses Render’s free tier, so the first request after inactivity can take around a minute while the server wakes up.
 
-Demo accounts (sample data, created for this demo):
+### Test accounts
 
-| Name  | Email           | Password   |
-|-------|-----------------|------------|
-| Tom   | tom@email.com   | Tom@1234   |
-| Alice | alice@email.com | Alice@1234 |
+- Email: `tom@email.com`  
+  Password: `Tom@1234`
 
-You can also sign up with your own account.
+- Email: `alice@email.com`  
+  Password: `Alice@1234`
 
-## Technology
+## Features
 
-- Backend: FastAPI, SQLAlchemy, PostgreSQL, psycopg 3, Pydantic, PyJWT, bcrypt
-- Frontend: React, Vite, JavaScript, CSS, fetch()
+- User registration and login
+- JWT-based authentication
+- Users can only view and manage their own applications
+- Add, edit, delete, and track internship applications
+- Filter applications by status
+- Dashboard showing total, applied, interview, offer, and rejected applications
+- Save resume or profile notes
+- AI Job-Fit Assistant for comparing a job description with saved resume notes
 
-## Structure
+## Tech stack
 
-```text
-interntrack/
-├── backend/       # FastAPI app and PostgreSQL models
-├── frontend/      # React app
-└── README.md
-```
+### Frontend
 
-## Deployment
+- React
+- Vite
+- JavaScript
+- CSS
+- `fetch()` for API calls
+
+### Backend
+
+- FastAPI
+- SQLAlchemy
+- PostgreSQL
+- Pydantic
+- PyJWT
+- bcrypt
+- Google Gemini API
+
+### Deployment
 
 - Frontend: Vercel
-- Backend: Render (FastAPI + Uvicorn)
-- Database: Neon (PostgreSQL)
+- Backend: Render
+- Database: Neon PostgreSQL
 
-Backend environment variables: `DATABASE_URL`, `SECRET_KEY`, `ACCESS_TOKEN_EXPIRE_MINUTES`, `FRONTEND_URL`
+## AI Job-Fit Assistant
 
-Frontend environment variable: `VITE_API_BASE_URL`
+The Job-Fit Assistant is a small RAG-based feature.
 
-## Run locally
+A user can save notes from their resume, such as skills, projects, coursework, or experience. Then they can paste a job description to get a match score, strengths, missing skills, and improvement suggestions.
 
-### 1. PostgreSQL setup
+The flow is kept simple:
 
-Create a database named `interntrack`:
+1. The user saves resume or profile notes.
+2. The backend splits saved notes into smaller chunks.
+3. Gemini embeddings are created for the job description and note chunks.
+4. Cosine similarity is used to find the most relevant note chunks.
+5. The relevant chunks and job description are sent to Gemini.
+6. Gemini returns a match score and suggestions, which are shown in the React UI.
 
-```sql
-CREATE DATABASE interntrack;
-```
+This project does not use a vector database or a large RAG framework. It uses a simple in-memory similarity comparison, which is easier to understand and suitable for a small project.
 
-In `backend`, copy `.env.example` to `.env` and set your PostgreSQL password plus a long random `SECRET_KEY`:
+## Project structure
 
-```env
-DATABASE_URL=postgresql://postgres:your_password@localhost:5432/interntrack
-SECRET_KEY=a-long-random-secret-value
-ACCESS_TOKEN_EXPIRE_MINUTES=60
-```
-
-Hosted databases such as Neon use the same format with `?sslmode=require` at the end of the URL.
-
-### 2. Run the backend
-
-```bash
-cd backend
-python3 -m venv .venv
-source .venv/bin/activate
-pip install -r requirements.txt
-uvicorn main:app --reload
-```
-
-FastAPI runs on http://127.0.0.1:8000. The first start creates the tables in PostgreSQL.
-
-### 3. Run the frontend
-
-Open another terminal:
-
-```bash
-cd frontend
-npm install
-npm run dev
-```
-
-Open http://localhost:5173.
-
-## API overview
-
-| Method | Endpoint             | Purpose                                                |
-|--------|----------------------|--------------------------------------------------------|
-| POST   | /auth/register       | Create an account and receive a JWT                    |
-| POST   | /auth/login          | Log in and receive a JWT                               |
-| GET    | /auth/me             | Get the logged-in user                                 |
-| GET    | /applications        | List own applications; supports `search` and `status_filter` |
-| GET    | /applications/{id}   | Get one own application                                |
-| POST   | /applications        | Create an application                                  |
-| PUT    | /applications/{id}   | Replace an application                                 |
-| DELETE | /applications/{id}   | Delete an application                                  |
-
-## Authentication flow
-
-Register or log in returns a JWT access token. The React app saves that token in browser `localStorage` and sends it in an `Authorization: Bearer <token>` header on application requests. FastAPI reads the token and always filters records by the token's user id, so one user cannot read or change another user's applications.
-
-## Key files
-
-- `backend/main.py` — all endpoints and ownership checks
-- `backend/models.py` — database tables and relationship
-- `backend/auth.py` — password hashing and JWT authentication
-- `frontend/src/api.js` — all `fetch()` calls
-- `frontend/src/App.jsx` — switching between login and dashboard
-- `frontend/src/Dashboard.jsx` — CRUD, dashboard counts, search, and filter
+```text
+InternTrack/
+├── backend/
+│   ├── auth.py
+│   ├── database.py
+│   ├── main.py
+│   ├── models.py
+│   ├── schemas.py
+│   ├── simple_rag.py
+│   ├── requirements.txt
+│   └── .env.example
+│
+├── frontend/
+│   ├── src/
+│   │   ├── api.js
+│   │   ├── App.jsx
+│   │   ├── AuthPage.jsx
+│   │   ├── Dashboard.jsx
+│   │   ├── ApplicationForm.jsx
+│   │   ├── JobFitAssistant.jsx
+│   │   └── styles.css
+│   ├── package.json
+│   └── vite.config.js
+│
+├── .gitignore
+└── README.md

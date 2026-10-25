@@ -13,6 +13,7 @@ class User(Base):
     password_hash = Column(String(255), nullable=False)
 
     applications = relationship("InternshipApplication", back_populates="user", cascade="all, delete")
+    profile_notes = relationship("ProfileNote", back_populates="user", cascade="all, delete")
 
 
 class InternshipApplication(Base):
@@ -29,3 +30,15 @@ class InternshipApplication(Base):
     user_id = Column(Integer, ForeignKey("users.id"), nullable=False)
 
     user = relationship("User", back_populates="applications")
+
+
+class ProfileNote(Base):
+    """A user-owned resume, skills, project, or experience note for the Job-Fit Assistant."""
+    __tablename__ = "profile_notes"
+
+    id = Column(Integer, primary_key=True, index=True)
+    title = Column(String(100), nullable=False)
+    content = Column(Text, nullable=False)
+    user_id = Column(Integer, ForeignKey("users.id"), nullable=False)
+
+    user = relationship("User", back_populates="profile_notes")

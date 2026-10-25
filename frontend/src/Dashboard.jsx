@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react";
 import { createApplication, deleteApplication, getApplications, updateApplication } from "./api";
 import ApplicationForm, { STATUSES } from "./ApplicationForm";
+import JobFitAssistant from "./JobFitAssistant";
 
 const statisticStatuses = ["Applied", "OA", "Interview", "Offer", "Rejected"];
 export default function Dashboard({ user, onLogout }) {
@@ -27,5 +28,6 @@ export default function Dashboard({ user, onLogout }) {
         {error && <div className="alert error">{error} <button className="retry-button" onClick={loadApplications}>Retry</button></div>}{message && <p className="alert success">{message}</p>}
         {loading ? <div className="empty"><p>{slowLoading ? "Starting the demo server..." : "Loading applications..."}</p>{slowLoading && <small>This free demo may take up to one minute on its first visit.</small>}</div> : applications.length === 0 ? <p className="empty">No applications found. Add one with the form.</p> : <div className="table-wrap"><table><thead><tr><th>Company / Role</th><th>Status</th><th>Location</th><th>Applied</th><th></th></tr></thead><tbody>{applications.map((item) => <tr key={item.id}><td><strong>{item.company}</strong><br /><span>{item.role}</span></td><td><span className="status">{item.status}</span></td><td>{item.location}</td><td>{item.application_date}</td><td className="actions"><button onClick={() => { setEditingApplication(item); setMessage(""); }}>Edit</button><button className="danger" onClick={() => removeApplication(item.id)}>Delete</button></td></tr>)}</tbody></table></div>}
       </section></div>
+    <JobFitAssistant />
   </main>;
 }

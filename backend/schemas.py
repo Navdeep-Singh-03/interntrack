@@ -45,3 +45,27 @@ class ApplicationResponse(ApplicationCreate):
     id: int
 
     model_config = ConfigDict(from_attributes=True)
+
+
+class ProfileNoteCreate(BaseModel):
+    title: str = Field(min_length=1, max_length=100)
+    content: str = Field(min_length=20, max_length=10000)
+
+
+class ProfileNoteResponse(ProfileNoteCreate):
+    id: int
+
+    model_config = ConfigDict(from_attributes=True)
+
+
+class JobFitRequest(BaseModel):
+    job_description: str = Field(min_length=50, max_length=15000)
+
+
+class JobFitResponse(BaseModel):
+    match_score: int = Field(ge=0, le=100)
+    summary: str
+    strengths: list[str]
+    missing_skills: list[str]
+    suggestions: list[str]
+    retrieved_note_titles: list[str]

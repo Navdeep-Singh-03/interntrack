@@ -24,3 +24,7 @@ export const getApplications = (search, status) => {
 export const createApplication = (application) => request("/applications", { method: "POST", body: JSON.stringify(application) });
 export const updateApplication = (id, application) => request(`/applications/${id}`, { method: "PUT", body: JSON.stringify(application) });
 export const deleteApplication = (id) => request(`/applications/${id}`, { method: "DELETE" });
+export const getProfileNotes = () => request("/profile-notes");
+export const createProfileNote = (note) => request("/profile-notes", { method: "POST", body: JSON.stringify(note) });
+export const deleteProfileNote = (id) => request(`/profile-notes/${id}`, { method: "DELETE" });
+export const getJobFit = (jobDescription) => request("/job-fit", { method: "POST", body: JSON.stringify({ job_description: jobDescription }) });

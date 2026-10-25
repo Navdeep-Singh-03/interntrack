@@ -8,8 +8,11 @@ from sqlalchemy.orm import Session
 
 from auth import create_access_token, get_current_user, hash_password, verify_password
 from database import Base, engine, get_db
-from models import InternshipApplication, User
-from schemas import ApplicationCreate, ApplicationResponse, TokenResponse, UserLogin, UserRegister, UserResponse
+from models import InternshipApplication, ProfileNote, User
+from schemas import (ApplicationCreate, ApplicationResponse, JobFitRequest, JobFitResponse,
+                     ProfileNoteCreate, ProfileNoteResponse, TokenResponse, UserLogin,
+                     UserRegister, UserResponse)
+from simple_rag import analyze_job_fit
 
 Base.metadata.create_all(bind=engine)
 
@@ -58,6 +61,36 @@ def login_user(login_data: UserLogin, db: Session = Depends(get_db)):
 @app.get("/auth/me", response_model=UserResponse)
 def get_me(current_user: User = Depends(get_current_user)):
     return current_user
+
+
+@app.get("/profile-notes", response_model=list[ProfileNoteResponse])
+def get_profile_notes(db: Session = Depends(get_db), current_user: User = Depends(get_current_user)):
+    return db.query(ProfileNote).filter(ProfileNote.user_id == current_user.id).order_by(ProfileNote.id.desc()).all()
+
+
+@app.post("/profile-notes", response_model=ProfileNoteResponse, status_code=status.HTTP_201_CREATED)
+def create_profile_note(note_data: ProfileNoteCreate, db: Session = Depends(get_db), current_user: User = Depends(get_current_user)):
+    note = ProfileNote(title=note_data.title.strip(), content=note_data.content.strip(), user_id=current_user.id)
+    db.add(note)
+    db.commit()
+    db.refresh(note)
+    return note
+
+
+@app.delete("/profile-notes/{note_id}")
+def delete_profile_note(note_id: int, db: Session = Depends(get_db), current_user: User = Depends(get_current_user)):
+    note = db.query(ProfileNote).filter(ProfileNote.id == note_id, ProfileNote.user_id == current_user.id).first()
+    if not note:
+        raise HTTPException(status_code=404, detail="Profile note not found")
+    db.delete(note)
+    db.commit()
+    return {"message": "Profile note deleted"}
+
+
+@app.post("/job-fit", response_model=JobFitResponse)
+def get_job_fit(request: JobFitRequest, db: Session = Depends(get_db), current_user: User = Depends(get_current_user)):
+    notes = db.query(ProfileNote).filter(ProfileNote.user_id == current_user.id).all()
+    return analyze_job_fit(request.job_description, notes)
 
 
 @app.get("/applications", response_model=list[ApplicationResponse])

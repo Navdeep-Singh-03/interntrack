@@ -6,3 +6,4 @@ python-dotenv
 PyJWT
 bcrypt
 psycopg[binary]
+google-genai
