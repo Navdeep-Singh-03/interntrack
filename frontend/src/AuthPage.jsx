@@ -25,7 +25,7 @@ export default function AuthPage({ onAuthenticated }) {
     <p className="demo-note">Demo note: the free API can take up to one minute to wake up on the first request.</p>
     {error && <p className="alert error">{error}</p>}
     <form onSubmit={submit}>
-      {isRegistering && <><label>Name</label><input name="name" value={form.name} onChange={change} required /></>}
+      {isRegistering && <><label>Name</label><input name="name" value={form.name} onChange={change} required /></>}{/*name only when registering */}
       <label>Email</label><input type="email" name="email" value={form.email} onChange={change} required />
       <label>Password</label><input type="password" name="password" value={form.password} onChange={change} minLength="6" required />
       <button className="primary" disabled={isLoading}>{isLoading ? "Please wait..." : isRegistering ? "Create account" : "Log in"}</button>
